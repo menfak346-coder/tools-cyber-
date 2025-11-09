@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Web Tools Dkzz</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #000;
+      color: #fff;
+      overflow-x: hidden;
+    }
+    canvas#bgCanvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: -1;
+    }
+    .container, .page {
+      display: none;
+      text-align: center;
+      padding: 20px;
+    }
+    .container.active, .page.active { display: block; }
+    .menu {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      margin-top: 40px;
+    }
+    .menu button {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      padding: 18px;
+      font-size: 16px;
+      background: #111;
+      border: 1px solid #444;
+      border-radius: 12px;
+      color: white;
+      cursor: pointer;
+      transition: background 0.3s, transform 0.2s;
+    }
+    .menu button:hover { 
+      background: #222; 
+      transform: scale(1.02);
+    }
+    .card {
+      max-width: 600px;
+      margin: 30px auto;
+      background: #111;
+      border: 1px solid #333;
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+    }
+    .card input, .card textarea {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border-radius: 8px;
+      border: 1px solid #444;
+      background: #000;
+      color: #fff;
+      font-size: 14px;
+      box-sizing: border-box;
+    }
+    .card textarea {
+      min-height: 200px;
+      resize: vertical;
+    }
+    .card input::placeholder,
+    .card textarea::placeholder {
+      color: #aaa;
+      font-size: 14px;
+      text-align: left;
+      padding-left: 2px;
+    }
+    .card button {
+      margin-top: 10px;
+      padding: 10px 15px;
+      background: #222;
+      border: 1px solid #444;
+      border-radius: 8px;
+      color: white;
+      cursor: pointer;
+    }
+    .card button:hover { background: #333; }
+    .actions {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    footer {
+      text-align: center;
+      padding: 20px;
+    }
+    footer a {
+      color: #1DA1F2;
+      text-decoration: none;
+      display: inline-flex;
+      gap: 5px;
+      align-items: center;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="bgCanvas"></canvas>
+
+  <!-- Home -->
+  <div class="container" id="home">
+    <h1>The Dkzz Tools V2</h1>
+    <div class="menu">
+      <button onclick="goPage('source')">
+        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="white" viewBox="0 0 24 24"><path d="M4 4h16v2H4V4zm0 14h16v2H4v-2zM4 9h16v6H4V9z"/></svg>
+        Get Source Code
+      </button>
+      <button onclick="goPage('myip')">
+        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="white" viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 10 10A10.011 10.011 0 0 0 12 2z"/></svg>
+        Cek IP Saya
+      </button>
+      <button onclick="goPage('headers')">
+        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="white" viewBox="0 0 24 24"><path d="M3 5h18v2H3V5zm0 6h18v2H3v-2zm0 6h12v2H3v-2z"/></svg>
+        Cek Headers
+      </button>
+      <button onclick="goPage('domainip')">
+        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="white" viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 10 10A10.011 10.011 0 0 0 12 2zm0 18a8 8 0 0 1-7.938-7h15.876A8 8 0 0 1 12 20z"/></svg>
+        Cek IP Domain
+      </button>
+    </div>
+
+    <!-- Background Music hanya di home -->
+    <div class="card" style="margin-top:40px;">
+      <h2>The Dkzz Tools Audio</h2>
+      <audio id="bgMusic" src="https://pomf2.lain.la/f/2al4woos.mp3" loop></audio>
+      <button onclick="toggleMusic()" id="musicBtn" style="display:flex;align-items:center;gap:10px;justify-content:center;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="white" viewBox="0 0 24 24">
+          <path id="musicPath" d="M8 5v14l11-7z"/>
+        </svg>
+        <span id="musicText">Play Music</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Get Source Code -->
+  <div class="page" id="source">
+    <div class="card">
+      <h2>Get Source Code</h2>
+      <input type="text" id="urlSource" placeholder="Masukkan URL (https://...)">
+      <button onclick="getSource()">Ambil Source</button>
+      <textarea id="sourceResult" placeholder="Hasil source code akan muncul di sini..." readonly></textarea>
+      <div class="actions">
+        <button onclick="copySource()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="white" viewBox="0 0 24 24"><path d="M16 1H4a2 2 0 0 0-2 2v14h2V3h12V1zm3 4H8a2 2 0 0 0-2 2v16h14a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 18H8V7h11v16z"/></svg>
+          Salin
+        </button>
+        <button onclick="downloadSource()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="white" viewBox="0 0 24 24"><path d="M12 16l4-5h-3V4h-2v7H8zM5 18h14v2H5z"/></svg>
+          Download
+        </button>
+      </div>
+      <button class="back" onclick="goPage('home')">Kembali</button>
+    </div>
+  </div>
+
+  <!-- Cek IP Saya -->
+  <div class="page" id="myip">
+    <div class="card">
+      <h2>Cek IP Saya</h2>
+      <p id="ipResult">Loading...</p>
+      <button class="back" onclick="goPage('home')">Kembali</button>
+    </div>
+  </div>
+
+  <!-- Cek Headers -->
+  <div class="page" id="headers">
+    <div class="card">
+      <h2>Cek Headers</h2>
+      <input type="text" id="urlHeaders" placeholder="Masukkan URL (https://...)">
+      <button onclick="getHeaders()">Cek Headers</button>
+      <pre id="headersResult"></pre>
+      <button class="back" onclick="goPage('home')">Kembali</button>
+    </div>
+  </div>
+
+  <!-- Cek IP Domain -->
+  <div class="page" id="domainip">
+    <div class="card">
+      <h2>Cek IP Domain</h2>
+      <input type="text" id="domainInput" placeholder="Masukkan domain (contoh: google.com)">
+      <button onclick="getDomainIP()">Cek IP</button>
+      <p id="domainResult"></p>
+      <button class="back" onclick="goPage('home')">Kembali</button>
+    </div>
+  </div>
+
+  <footer>
+    <a href="https://t.me/dkzzxiterz" target="_blank">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="#1DA1F2" viewBox="0 0 24 24"><path d="M9.032 15.998l-.398 5.602c.57 0 .815-.242 1.11-.533l2.664-2.555 5.52 4.017c1.01.556 1.726.263 1.991-.934l3.61-16.96.001-.001c.319-1.489-.539-2.073-1.519-1.709L1.646 9.541c-1.44.562-1.417 1.365-.244 1.729l5.962 1.863L18.79 6.55c.56-.367 1.07-.164.65.203"/></svg>
+      Dkzz Developer
+    </a>
+  </footer>
+
+  <script>
+    // Navigasi antar halaman
+    function goPage(page) {
+      document.querySelectorAll('.container, .page').forEach(p => p.classList.remove('active'));
+      document.getElementById(page).classList.add('active');
+    }
+    goPage('home');
+
+    // Get Source Code dengan blacklist dari GitHub
+    async function getSource() {
+      const url = document.getElementById("urlSource").value;
+      if (!url) return alert("Masukkan URL dulu!");
+
+      // Ambil blacklist dari GitHub
+      let blacklist = [];
+      try {
+        const res = await fetch("https://raw.githubusercontent.com/XyzzMoods/blacklist/refs/heads/main/blacklist.json");
+        blacklist = await res.json();
+      } catch {
+        return alert("Gagal mengambil daftar blacklist!");
+      }
+
+      // Cek apakah URL termasuk blacklist
+      try {
+        const hostname = (new URL(url)).hostname.toLowerCase();
+        const isBlocked = blacklist.some(domain =>
+          hostname === domain || hostname.endsWith("." + domain)
+        );
+        if (isBlocked) {
+          return alert("⚠️ Domain ini diblokir dan tidak bisa diambil source code-nya!");
+        }
+      } catch {
+        return alert("URL tidak valid!");
+      }
+
+      // Ambil source code
+      try {
+        const res = await fetch("https://api.allorigins.win/raw?url=" + encodeURIComponent(url));
+        const text = await res.text();
+        document.getElementById("sourceResult").value = text;
+      } catch {
+        alert("Gagal mengambil source code");
+      }
+    }
+
+    function copySource() {
+      const text = document.getElementById("sourceResult");
+      text.select();
+      document.execCommand("copy");
+      alert("Source code disalin!");
+    }
+    function downloadSource() {
+      const content = document.getElementById("sourceResult").value;
+      if (!content) return alert("Belum ada source code!");
+      const blob = new Blob([content], { type: "text/plain" });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = "source-code.html";
+      link.click();
+    }
+
+    // Cek IP Saya
+    fetch("https://api64.ipify.org?format=json")
+      .then(r => r.json())
+      .then(d => document.getElementById("ipResult").innerText = d.ip);
+
+    // Cek Headers
+    async function getHeaders() {
+      const url = document.getElementById("urlHeaders").value;
+      if (!url) return alert("Masukkan URL!");
+      try {
+        const res = await fetch("https://api.allorigins.win/raw?url=" + encodeURIComponent(url));
+        let headers = "";
+        res.headers.forEach((v,k)=> headers += k+": "+v+"\n");
+        document.getElementById("headersResult").innerText = headers || "Tidak ada headers.";
+      } catch {
+        alert("Gagal cek headers");
+      }
+    }
+
+    // Cek IP Domain
+    async function getDomainIP() {
+      const domain = document.getElementById("domainInput").value;
+      if (!domain) return alert("Masukkan domain!");
+      try {
+        const res = await fetch("https://dns.google/resolve?name=" + domain);
+        const data = await res.json();
+        const ip = data.Answer ? data.Answer.map(a=>a.data).join(", ") : "Tidak ditemukan.";
+        document.getElementById("domainResult").innerText = "IP: " + ip;
+      } catch {
+        alert("Gagal cek IP domain");
+      }
+    }
+
+    // Toggle Music
+    function toggleMusic() {
+      const music = document.getElementById("bgMusic");
+      const text = document.getElementById("musicText");
+      const path = document.getElementById("musicPath");
+
+      if (music.paused) {
+        music.play();
+        text.textContent = "Pause Music";
+        path.setAttribute("d", "M6 19h4V5H6v14zm8-14v14h4V5h-4z"); // pause icon
+      } else {
+        music.pause();
+        text.textContent = "Play Music";
+        path.setAttribute("d", "M8 5v14l11-7z"); // play icon
+      }
+    }
+
+    // Background Particles
+    const canvas = document.getElementById("bgCanvas");
+    const ctx = canvas.getContext("2d");
+    let particles = [];
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      const count = window.innerWidth < 600 ? 60 : 120;
+      particles = [];
+      for (let i=0;i<count;i++) {
+        particles.push({
+          x: Math.random()*canvas.width,
+          y: Math.random()*canvas.height,
+          vx: (Math.random()-0.5)*1,
+          vy: (Math.random()-0.5)*1,
+          r: 1.2
+        });
+      }
+    }
+    function animate() {
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+      for (let p of particles) {
+        p.x += p.vx;
+        p.y += p.vy;
+        if (p.x<0||p.x>canvas.width) p.vx*=-1;
+        if (p.y<0||p.y>canvas.height) p.vy*=-1;
+        ctx.beginPath();
+        ctx.arc(p.x,p.y,p.r,0,2*Math.PI);
+        ctx.fillStyle="white";
+        ctx.fill();
+      }
+      for (let i=0;i<particles.length;i++) {
+        for (let j=i+1;j<particles.length;j++) {
+          let dx = particles[i].x - particles[j].x;
+          let dy = particles[i].y - particles[j].y;
+          let dist = Math.sqrt(dx*dx+dy*dy);
+          if (dist<120) {
+            ctx.beginPath();
+            ctx.moveTo(particles[i].x,particles[i].y);
+            ctx.lineTo(particles[j].x,particles[j].y);
+            ctx.strokeStyle="white";
+            ctx.lineWidth = 0.3;
+            ctx.stroke();
+          }
+        }
+      }
+      requestAnimationFrame(animate);
+    }
+    window.addEventListener("resize", resizeCanvas);
+    resizeCanvas();
+    animate();
+  </script>
+</body>
+</html>
